@@ -23,16 +23,7 @@ const Contacts = () => {
       <Row>
         {contacts.length > 0 ? (
           contacts.map((contact) => (
-            <Col
-              xs={{
-                span: 5,
-                offset: 1,
-              }}
-              lg={{
-                span: 6,
-                offset: 2,
-              }}
-            >
+            <Col span={6}>
               <Suspense fallback={<Skeleton />}>
                 <Contact data={contact} /> <br />
               </Suspense>
