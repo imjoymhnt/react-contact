@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Form, Input, Button, Select, Checkbox, message } from "antd";
+import { nanoid } from "nanoid";
 
 const AddContact = () => {
   const [imageUrl, setImageUrl] = useState("");
@@ -25,14 +26,21 @@ const AddContact = () => {
     if (contacts) {
       const jsonData = JSON.parse(contacts);
       let isWhatsapp = values.isWhatsapp;
-      const newData = { ...values, profile: imageUrl, isWhatsapp };
+      const newData = {
+        ...values,
+        profile: imageUrl,
+        isWhatsapp,
+        id: nanoid(),
+      };
       const data = [...jsonData, newData];
       localStorage.setItem("contacts", JSON.stringify(data));
       message.success("Contact Added Successfully!");
       form.resetFields();
     } else {
       let isWhatsapp = values.isWhatsapp;
-      const arrData = [{ ...values, profile: imageUrl, isWhatsapp }];
+      const arrData = [
+        { ...values, profile: imageUrl, isWhatsapp, id: nanoid() },
+      ];
       localStorage.setItem("contacts", JSON.stringify(arrData));
       message.success("Contact Added Successfully!");
       form.resetFields();
