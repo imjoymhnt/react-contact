@@ -1,26 +1,9 @@
 import React, { useState } from "react";
-import { PlusOutlined } from "@ant-design/icons";
-import {
-  Form,
-  Input,
-  Button,
-  Radio,
-  Select,
-  Cascader,
-  DatePicker,
-  InputNumber,
-  TreeSelect,
-  Switch,
-  Checkbox,
-  Upload,
-} from "antd";
-const { RangePicker } = DatePicker;
-const { TextArea } = Input;
+import { Form, Input, Button, Select, Checkbox, message } from "antd";
 
 const AddContact = () => {
-  const [image, setImage] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-
+  const [form] = Form.useForm();
   const handleUpload = (e) => {
     const data = new FormData();
     data.append("file", e.target.files[0]);
@@ -37,8 +20,6 @@ const AddContact = () => {
       .catch((err) => console.log(err));
   };
 
-  const { Option } = Select;
-
   const onFinish = async (values) => {
     const contacts = await localStorage.getItem("contacts");
     if (contacts) {
@@ -46,13 +27,15 @@ const AddContact = () => {
       let isWhatsapp = values.isWhatsapp;
       const newData = { ...values, profile: imageUrl, isWhatsapp };
       const data = [...jsonData, newData];
-      console.log(data);
       localStorage.setItem("contacts", JSON.stringify(data));
+      message.success("Contact Added Successfully!");
+      form.resetFields();
     } else {
       let isWhatsapp = values.isWhatsapp;
       const arrData = [{ ...values, profile: imageUrl, isWhatsapp }];
       localStorage.setItem("contacts", JSON.stringify(arrData));
-      console.log(arrData);
+      message.success("Contact Added Successfully!");
+      form.resetFields();
     }
   };
 
@@ -60,6 +43,7 @@ const AddContact = () => {
     <>
       <br />
       <Form
+        form={form}
         onFinish={onFinish}
         labelCol={{
           span: 4,
