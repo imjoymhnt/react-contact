@@ -1,8 +1,8 @@
-import { Col, Row } from "antd";
-import React, { useEffect, useState } from "react";
+import { Col, Row, Skeleton } from "antd";
+import React, { Suspense, useEffect, useState } from "react";
 import NoData from "../NoData";
-import Contact from "./Contact";
 import "./style.css";
+const Contact = React.lazy(() => import("./Contact"));
 
 const Contacts = () => {
   const [contacts, setContacts] = useState([]);
@@ -10,7 +10,10 @@ const Contacts = () => {
     const getData = async () => {
       const data = await localStorage.getItem("contacts");
       if (data?.length) {
-        setContacts(JSON.parse(data));
+        const newData = JSON.parse(data).sort((a, b) =>
+          a.name.localeCompare(b.name)
+        );
+        setContacts(newData);
       }
     };
     getData();
@@ -30,7 +33,9 @@ const Contacts = () => {
                 offset: 2,
               }}
             >
-              <Contact data={contact} /> <br />
+              <Suspense fallback={<Skeleton />}>
+                <Contact data={contact} /> <br />
+              </Suspense>
             </Col>
           ))
         ) : (
