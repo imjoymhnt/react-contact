@@ -1,6 +1,5 @@
-import { Button, Col, Empty, Row } from "antd";
+import { Col, Empty, Row } from "antd";
 import React from "react";
-import { Link } from "react-router-dom";
 import LinkButton from "./LinkButton";
 
 const NoData = () => {
