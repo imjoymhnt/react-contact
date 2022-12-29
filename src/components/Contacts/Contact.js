@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DeleteOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 
 import { Card, Modal } from "antd";
 
@@ -26,6 +26,10 @@ const Contact = ({ data }) => {
       cover={<img alt="Profile picture" src={data.profile} height={200} />}
       actions={[
         <DeleteOutlined key="setting" onClick={() => setOpenModal(true)} />,
+        <EditOutlined
+          key="setting"
+          onClick={() => window.location.assign(`/edit-contact/${data.id}`)}
+        />,
       ]}
     >
       <Modal

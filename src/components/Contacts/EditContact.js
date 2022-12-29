@@ -1,11 +1,13 @@
+import { Button, Checkbox, Form, Input, Select, message } from "antd";
 import React, { useState } from "react";
-import { Form, Input, Button, Select, Checkbox, message } from "antd";
-import { nanoid } from "nanoid";
+import { useParams } from "react-router-dom";
 
-const AddContact = () => {
+const EditContact = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
   const handleUpload = (e) => {
+    setLoading(true);
     const data = new FormData();
     data.append("file", e.target.files[0]);
     data.append("upload_preset", "react-contact");
@@ -17,35 +19,35 @@ const AddContact = () => {
       .then((resp) => resp.json())
       .then((data) => {
         setImageUrl(data.url);
+        setLoading(false);
       })
       .catch((err) => console.log(err));
   };
 
-  const onFinish = async (values) => {
-    const contacts = await localStorage.getItem("contacts");
+  const { id } = useParams();
 
-    if (contacts) {
-      const jsonData = JSON.parse(contacts);
-      let isWhatsapp = values.isWhatsapp ? values.isWhatsapp : false;
-      const newData = {
-        ...values,
-        profile: imageUrl,
-        isWhatsapp,
-        id: nanoid(),
-      };
-      const data = [...jsonData, newData];
-      localStorage.setItem("contacts", JSON.stringify(data));
-      message.success("Contact Added Successfully!");
-      form.resetFields();
-    } else {
-      let isWhatsapp = values.isWhatsapp ? values.isWhatsapp : false;
-      const arrData = [
-        { ...values, profile: imageUrl, isWhatsapp, id: nanoid() },
-      ];
-      localStorage.setItem("contacts", JSON.stringify(arrData));
-      message.success("Contact Added Successfully!");
-      form.resetFields();
-    }
+  const contacts = JSON.parse(localStorage.getItem("contacts"));
+  const current = contacts.find((el) => el.id === id);
+
+  const onFinish = async (values) => {
+    const newContacts = contacts.reduce((acc, curr) => {
+      if (curr.id === id) {
+        const newData = {
+          ...values,
+          profile: imageUrl ? imageUrl : curr.profile,
+          id: current.id,
+          isWhatsapp: values.isWhatsapp ? values.isWhatsapp : false,
+        };
+        acc.push(newData);
+      } else {
+        acc.push(curr);
+      }
+      return acc;
+    }, []);
+
+    localStorage.setItem("contacts", JSON.stringify(newContacts));
+    message.success("Contact Updated!");
+    window.location.assign("/");
   };
 
   return (
@@ -62,17 +64,21 @@ const AddContact = () => {
         }}
         layout="horizontal"
       >
-        <Form.Item label="Name" name="name">
+        <Form.Item label="Name" name="name" initialValue={current.name}>
           <Input />
         </Form.Item>
-        <Form.Item name="phone" label="Phone Number">
+        <Form.Item
+          name="phone"
+          label="Phone Number"
+          initialValue={current.phone}
+        >
           <Input
             style={{
               width: "100%",
             }}
           />
         </Form.Item>
-        <Form.Item label="Type" name="type">
+        <Form.Item label="Type" name="type" initialValue={current.type}>
           <Select>
             <Select.Option value="personal">Personal</Select.Option>
             <Select.Option value="office">Office</Select.Option>
@@ -83,6 +89,7 @@ const AddContact = () => {
           label="Is Whatsapp"
           name="isWhatsapp"
           valuePropName="checked"
+          initialValue={current.isWhatsapp}
         >
           <Checkbox>isWhatsapp</Checkbox>
         </Form.Item>
@@ -96,8 +103,8 @@ const AddContact = () => {
             span: 14,
           }}
         >
-          <Button type="primary" htmlType="submit" disabled={!imageUrl}>
-            Add Contact
+          <Button type="primary" htmlType="submit" loading={loading}>
+            Update Contact
           </Button>
         </Form.Item>
       </Form>
@@ -105,4 +112,4 @@ const AddContact = () => {
   );
 };
 
-export default AddContact;
+export default EditContact;
